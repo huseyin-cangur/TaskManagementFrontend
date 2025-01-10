@@ -22,8 +22,11 @@ const Login = () => {
 
         authService.login(data).then((result) => {
             if (result) {
+                console.log("result",result)
                 navigate('/tasks')
                 localStorage.setItem("userId", result.id);
+                localStorage.setItem("userName", result.fullName);
+                localStorage.setItem("isAdmin", result.isAdmin);
             }
             else {
                 setError("Tc kimlik no veya parola hatalı");
