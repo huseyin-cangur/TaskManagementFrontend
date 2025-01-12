@@ -29,12 +29,7 @@ const style = {
 
 const Task = () => {
 
-  const validationSchema = Yup.object({
-    firstName: Yup.string()
-      .min(2, 'Adınız çok kısa!')
-      .max(50, 'Adınız çok uzun!')
-      .required('Adınız zorunludur!'),
-  });
+
 
   const [tasks, setTasks] = useState<ITask[]>([])
   const [users, setUsers] = useState<IUser[]>([])
@@ -43,7 +38,8 @@ const Task = () => {
     title: '',
     description: '',
     status: false,
-    userIds: []
+    userIds: [],
+    userNames:[]
   })
   const [errors, setErrors] = useState<{
     title: string;
@@ -92,7 +88,7 @@ const Task = () => {
 
   const getTasks = () => {
     TaskService.getTasksByUser(userId).then((result) => {
-
+      console.log(result);
       if (result)
         setTasks(result);
     });
@@ -108,7 +104,6 @@ const Task = () => {
 
   function editTask(id: String) {
     getTaskById(id);
-
 
   }
 
@@ -136,6 +131,21 @@ const Task = () => {
     return Object.keys(newErrors).length === 0;
 
   }
+  const remove = (id: String) => {
+
+    TaskService.remove(id).then((result) => {
+
+      if (result == true) {
+        alert("Silme işlemi başarılı.")
+        getTasks();
+      }
+      else {
+        alert("Silme işlemi başarısız.")
+      }
+
+    })
+
+  }
 
   const handleSubmit = () => {
 
@@ -145,16 +155,31 @@ const Task = () => {
       if (!isAdmin)
         task.userIds.push(userId);
 
-      TaskService.add(task).then((result) => {
-        if (result) {
+      if (task.id == "" || task.id == null) {
+        TaskService.add(task).then((result) => {
+          if (result) {
 
-          setOpen(false);
+            setOpen(false);
+            handleResetForm();
+            alert("Ekleme işlemi başarılı")
+            getTasks();
+
+          }
+        })
+      }
+      else {
+        TaskService.update(task).then((result) => {
+
+          if (result)
+            setOpen(false);
           handleResetForm();
-          alert("Ekleme işlemi başarılı")
+          alert("Güncelleme işlemi başarılı")
           getTasks();
 
-        }
-      })
+        })
+      }
+
+
     }
     else {
       console.log('Form has errors');
@@ -171,16 +196,18 @@ const Task = () => {
       title: '',
       description: '',
       status: false,
-      userIds: []
+      userIds: [],
+      userNames:[]
 
     })
   }
 
 
+
   return (
     <>
       <Header />
-      <TaskTable handleOpenModalChild={handleOpenModalChild} data={tasks} />
+      <TaskTable handleRemoveTask={remove} handleOpenModalChild={handleOpenModalChild} data={tasks} />
       <Button style={{ marginTop: '20px' }} onClick={() => setOpen(true)} variant="contained">Add task</Button>
 
       <Modal
@@ -194,17 +221,18 @@ const Task = () => {
 
             {isAdmin ?
               <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label">Users</InputLabel>
+                <InputLabel id="users-select-label">Users</InputLabel>
                 <Select
                   multiple
-                  labelId="demo-simple-select-label"
+                  labelId="users-select-label"
                   id="users"
                   defaultValue={task.userIds}
-                  label={"Status"}
+                  label={"Users"}
+                  value={task.userIds ?? []}
                   onChange={(e) => {
 
                     if (Array.isArray(e.target.value)) {
-                      task.userIds = e.target.value;
+                      setTask({ ...task, userIds: e.target.value });
                     }
                   }}
                 >
@@ -225,8 +253,9 @@ const Task = () => {
                 variant="outlined"
                 fullWidth
                 margin="normal"
+                value={task.title}
                 defaultValue={task.title}
-                onChange={(e) => task.title = e.target.value}
+                onChange={(e) => setTask({ ...task, title: e.target.value })}
               />
               {errors.title && <p style={{ color: 'red' }}>{errors.title}</p>}
             </FormControl>
@@ -236,8 +265,9 @@ const Task = () => {
                 variant="outlined"
                 fullWidth
                 margin="normal"
+                value={task.description}
                 defaultValue={task.description}
-                onChange={(e) => task.description = e.target.value}
+                onChange={(e) => setTask({ ...task, description: e.target.value })}
               />
               {errors.description && <p style={{ color: 'red' }}>{errors.description}</p>}
             </FormControl>
@@ -249,8 +279,8 @@ const Task = () => {
                 id="demo-simple-select"
                 defaultValue={task.status}
                 label={"Status"}
-
-                onChange={(e) => task.status = JSON.parse(e.target.value.toString())}
+                value={task.status}
+                onChange={(e) => setTask({ ...task, status: JSON.parse(e.target.value.toString()) })}
               >
                 <MenuItem value={"true"}>Completed</MenuItem>
                 <MenuItem value={"false"}>Not Completed</MenuItem>

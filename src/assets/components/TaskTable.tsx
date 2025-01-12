@@ -13,14 +13,20 @@ import Button from '@mui/material/Button';
 interface TaskTableProps {
   data: ITask[];
   handleOpenModalChild: any
+  handleRemoveTask: any
 }
 
-const TaskTable: React.FC<TaskTableProps> = ({ data, handleOpenModalChild }) => {
+const TaskTable: React.FC<TaskTableProps> = ({ data, handleOpenModalChild, handleRemoveTask }) => {
 
   const handleSubmit = (id: string) => {
-    handleOpenModalChild(true,id);  // Parent'a mesajı gönderiyoruz
+    handleOpenModalChild(true, id);  // Parent'a mesajı gönderiyoruz
     // Mesaj kutusunu temizliyoruz
   };
+
+  const handleRemove = (id: string) => {
+    handleRemoveTask(id);
+
+  }
 
   return (
     <TableContainer component={Paper}>
@@ -45,10 +51,10 @@ const TaskTable: React.FC<TaskTableProps> = ({ data, handleOpenModalChild }) => 
               </TableCell>
               <TableCell >{row.description}</TableCell>
               <TableCell >{row.status == true ? "Tamamlandı" : "Tamamlanmadı"}</TableCell>
-              <TableCell>{"USERS"}</TableCell>
+              <TableCell>{row.userNames.join(",")}</TableCell>
               <TableCell>
                 <Button onClick={() => handleSubmit(row.id)}>Edit</Button>
-                <Button>Delete</Button>
+                <Button onClick={() => handleRemove(row.id)}>Delete</Button>
               </TableCell>
 
             </TableRow>

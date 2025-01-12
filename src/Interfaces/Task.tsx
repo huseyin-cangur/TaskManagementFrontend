@@ -5,6 +5,7 @@ interface ITask {
     description: string;
     status:boolean
     userIds:string[]
+    userNames:string[]
 
 }
 

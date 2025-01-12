@@ -1,4 +1,5 @@
 
+import { string } from 'yup';
 import ITask from '../../Interfaces/Task';
 import httpService from '../services/httpService'
 
@@ -14,6 +15,12 @@ const TaskService = {
     },
     add: async (task: ITask) => {
         return httpService.post("Task/Create", task);
+    },
+    remove: async (id: String) => {
+        return httpService.get("Task/Remove", {id:id});
+    },
+    update:async(task:ITask) =>{
+        return httpService.post("Task/Update", task);
     }
 
 
