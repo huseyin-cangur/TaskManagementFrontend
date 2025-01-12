@@ -4,7 +4,7 @@ interface ITask {
     title: string;
     description: string;
     status:boolean
-    users:string[]
+    userIds:string[]
 
 }
 
