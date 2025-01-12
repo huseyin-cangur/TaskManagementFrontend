@@ -2,8 +2,8 @@
 import axios from 'axios';
 
 // API base URL
-const API_URL = 'http://localhost:5064/api/'; // Burada API URL'nizi belirtin
-
+const API_URL = import.meta.env.VITE_API_URL;// Burada API URL'nizi belirtin
+ 
 const httpService = {
   get: async (endpoint:String, params = {}) => {
     try {
